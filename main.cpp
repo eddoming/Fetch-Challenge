@@ -13,7 +13,7 @@ int main()
 
 MainCore::MainCore(void)
 {
-    std::cout << "Fetch Read JSON version 0.1" << std::endl;
+    std::cout << "Fetch Read JSON version 0.2" << std::endl;
     StartAnalysis();
 }
 
@@ -87,6 +87,9 @@ void MainCore::AnalyzeJSON(std::string JSON)
     std::string retailerData;
     std::string purchaseDate;
     std::string purchaseTime;
+    std::string itemDescription;
+    std::string itemPrice;
+    int countItems;
     int currentTotalAmountOfPoints = 0;
     bool exitFlag = false;
 
@@ -184,16 +187,22 @@ void MainCore::AnalyzeJSON(std::string JSON)
         case 3:
             if (localString.at(0) == ',')
             {
-                if (localString.substr(2, 12).compare("purchaseTime") == 0)
+                if (localString.substr(2, 5).compare("items") == 0)
                 {
-                    localString = localString.substr(12 + 6);
-                    pos = localString.find("\"");
+                    localString = localString.substr(5 + 4);
+                    pos = localString.find('[');
                     if (pos != std::string::npos)
                     {
-                        purchaseTime = localString.substr(0, pos);
-                        localString = localString.substr(pos + 1);
-                        currentTotalAmountOfPoints += Fetch::TimePurchase(purchaseTime);
-                        localStep = 3;
+                        pos = localString.find('{');
+                        if (pos != std::string::npos)
+                        {
+                            localStep = 4;
+                            localString = localString.substr(pos + 1);
+                        }
+                        else
+                        {
+                            exitFlag = true;
+                        }
                     }
                     else
                     {
@@ -211,7 +220,103 @@ void MainCore::AnalyzeJSON(std::string JSON)
             }
             break;
         case 4:
+            if (localString.at(0) == '\"')
+            {
+                if (localString.substr(1, 16).compare("shortDescription") == 0)
+                {
+                    countItems += 1;
+                    localString = localString.substr(16 + 5);
+                    pos = localString.find("\"");
+                    if (pos != std::string::npos)
+                    {
+                        itemDescription = localString.substr(0, pos);
+                        std::cout << itemDescription << std::endl;
+                        localString = localString.substr(pos + 1);
+                        if (Fetch::TrimmedLength(itemDescription) == true)
+                        {
+                            localStep = 5;
+                        }
+                        else
+                        {
+                            pos = localString.find('}');
+                            if (pos != std::string::npos)
+                            {
+                                localString = localString.substr(pos);
+                                localStep = 6;
+                            }
+                            else
+                            {
+                                exitFlag = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        exitFlag = true;
+                    }
+                }
+                else
+                {
+                    exitFlag = true;
+                }
+            }
+            else
+            {
+                exitFlag = true;
+            }
+            break;
+        case 5:
+            if (localString.at(0) == ',')
+            {
+                if (localString.substr(2, 5).compare("price") == 0)
+                {
+                    localString = localString.substr(5 + 6);
+                    pos = localString.find("\"");
+                    if (pos != std::string::npos)
+                    {
+                        itemPrice = localString.substr(0, pos);
+                        std::cout << itemPrice << std::endl;
+                        localString = localString.substr(pos + 1);
+                        currentTotalAmountOfPoints += Fetch::TrimmedLengthPoints(itemPrice);
+                        localStep = 6;
+                    }
+                    else
+                    {
+                        exitFlag = true;
+                    }
+                }
+                else
+                {
+                    exitFlag = true;
+                }
+            }
+            else
+            {
+                exitFlag = true;
+            }
+            break;
+        case 6:
+            if (localString.substr(0, 3).compare("},{") == 0)
+            {
+                localStep = 4;
+                localString = localString.substr(3);
+            }
+            else
+            {
+                if (localString.substr(0, 3).compare("}],") == 0)
+                {
+                    localStep = 7;
+                    localString = localString.substr(2);
+                }
+                else
+                {
+                    exitFlag = true;
+                }
+            }
+            break;
+        case 7:
             exitFlag = true;
+            break;
         }
     }
 }

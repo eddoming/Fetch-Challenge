@@ -6,6 +6,8 @@
 #include <vector>
 #include <cctype>
 #include <string>
+#include <cmath>
+#include <algorithm>
 
 class Fetch
 {
@@ -16,6 +18,9 @@ public:
     int TotalRoundAnd25(std::string Total);
     int TimePurchase(std::string Time);
     int OddDay(std::string Date);
+    bool TrimmedLength(std::string ItemDescription);
+    int TrimmedLengthPoints(std::string ItemPrice);
+    int ItemsEven(int CountItems);
 
 private:
     int Test;

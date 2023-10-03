@@ -116,3 +116,63 @@ int Fetch::OddDay(std::string Date)
 
     return returnResult;
 }
+
+bool Fetch::TrimmedLength(std::string ItemDescription)
+{
+    bool returnResult = false;
+    bool exitFlag = false;
+    int lengthInt;
+    double lengthDouble;
+
+    while (exitFlag == false)
+    {
+        if (ItemDescription.at(0) == ' ')
+        {
+            ItemDescription = ItemDescription.substr(1);
+        }
+        else
+        {
+            if (ItemDescription.at(ItemDescription.length() - 1) == ' ')
+            {
+                ItemDescription = ItemDescription.substr(0, ItemDescription.length() - 1);
+            }
+            else
+            {
+                exitFlag = true;
+            }
+        }
+    }
+
+    lengthInt = (int)ItemDescription.length() / 3;
+    lengthDouble = (double)ItemDescription.length() / 3;
+
+    if ((lengthInt - lengthDouble) == 0)
+    {
+        returnResult = true;
+    }
+    else
+    {
+        returnResult = false;
+    }
+
+    return returnResult;
+}
+
+int Fetch::TrimmedLengthPoints(std::string ItemPrice)
+{
+    int returnResult = 0;
+    double price = stod(ItemPrice);
+
+    returnResult = ceil(price * 0.2);
+    std::cout << "Item description is a multiple of 3, multiply the price by 0.2 and round up to the nearest integer: +" << returnResult << std::endl;
+    return returnResult;
+}
+
+int Fetch::ItemsEven(int CountItems)
+{
+    int operationDivision;
+    operationDivision = CountItems / 2;
+    operationDivision *= 5; 
+    std::cout << "5 points for every two items on the receipt: +" << operationDivision << std::endl;
+	return operationDivision;
+}
