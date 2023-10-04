@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <chrono>
 #include "Fetch.h"
 
 class MainCore: public Fetch

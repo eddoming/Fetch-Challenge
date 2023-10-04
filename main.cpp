@@ -13,7 +13,7 @@ int main()
 
 MainCore::MainCore(void)
 {
-    std::cout << "Fetch Read JSON version 0.2" << std::endl;
+    std::cout << "Fetch Read JSON version 1.0" << std::endl;
     StartAnalysis();
 }
 
@@ -25,7 +25,8 @@ bool MainCore::StartAnalysis(void)
 {
     std::string localMessage;
     bool exitFlag = false;
-    int i;
+    int i = 0;
+    //long sec;
     localMessage = "Fetch example";
     std::cout << localMessage << std::endl;
     if (ReadTestJSON() == true)
@@ -34,7 +35,11 @@ bool MainCore::StartAnalysis(void)
         {
             if (i < (int)ListOfJSON.size())
             {
+                //sec = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                //std::cout << sec << "Before seconds since the Epoch\n";
                 AnalyzeJSON(ListOfJSON[i]);
+                //sec = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                //std::cout << sec << "After seconds since the Epoch\n";
                 ++i;
             }
             else
@@ -53,21 +58,33 @@ bool MainCore::StartAnalysis(void)
 bool MainCore::ReadTestJSON(void)
 {
     bool returnResult = false;
+    bool exitFlag = false;
     std::fstream localfstream;
     std::string localJSONRead;
 
     localfstream.open("readFile.txt", std::fstream::in);
     if (localfstream.is_open() == true)
     {
-        if (getline(localfstream,localJSONRead))
+        while (exitFlag == false)
         {
-            returnResult = true;
-            //std::cout << localJSONRead << std::endl;
-            ListOfJSON.push_back(localJSONRead);
-        }
-        else
-        {
-            std::cout << "Empty" << std::endl;
+            if (getline(localfstream, localJSONRead))
+            {
+                if (localJSONRead.empty() == false)
+                {
+                    returnResult = true;
+                    std::cout << localJSONRead << std::endl;
+                    ListOfJSON.push_back(localJSONRead);
+                }
+                else
+                {
+                    exitFlag = true;
+                }
+            }
+            else
+            {
+                std::cout << "No more inputs." << std::endl;
+                exitFlag = true;
+            }
         }
     }
     else
@@ -89,7 +106,9 @@ void MainCore::AnalyzeJSON(std::string JSON)
     std::string purchaseTime;
     std::string itemDescription;
     std::string itemPrice;
-    int countItems;
+    std::string totalPrice;
+    std::string responseJSON;
+    int countItems = 0;
     int currentTotalAmountOfPoints = 0;
     bool exitFlag = false;
 
@@ -230,7 +249,7 @@ void MainCore::AnalyzeJSON(std::string JSON)
                     if (pos != std::string::npos)
                     {
                         itemDescription = localString.substr(0, pos);
-                        std::cout << itemDescription << std::endl;
+                        //std::cout << itemDescription << std::endl;
                         localString = localString.substr(pos + 1);
                         if (Fetch::TrimmedLength(itemDescription) == true)
                         {
@@ -275,7 +294,7 @@ void MainCore::AnalyzeJSON(std::string JSON)
                     if (pos != std::string::npos)
                     {
                         itemPrice = localString.substr(0, pos);
-                        std::cout << itemPrice << std::endl;
+                        //std::cout << itemPrice << std::endl;
                         localString = localString.substr(pos + 1);
                         currentTotalAmountOfPoints += Fetch::TrimmedLengthPoints(itemPrice);
                         localStep = 6;
@@ -315,6 +334,42 @@ void MainCore::AnalyzeJSON(std::string JSON)
             }
             break;
         case 7:
+            currentTotalAmountOfPoints += Fetch::ItemsEven(countItems);
+            localStep = 8;
+            break;
+        case 8:
+            //std::cout << localString << std::endl;
+            if (localString.at(0) == ',')
+            {
+                if (localString.substr(2, 5).compare("total") == 0)
+                {
+                    localString = localString.substr(5 + 6);
+                    pos = localString.find("\"");
+                    if (pos != std::string::npos)
+                    {
+                        totalPrice = localString.substr(0, pos);
+                        localString = localString.substr(pos + 1);
+                        currentTotalAmountOfPoints += Fetch::TotalRoundAnd25(totalPrice);
+                        localStep = 9;
+                    }
+                    else
+                    {
+                        exitFlag = true;
+                    }
+                }
+                else
+                {
+                    exitFlag = true;
+                }
+            }
+            else
+            {
+                exitFlag = true;
+            }
+            break;
+        case 9:
+            responseJSON = "{ \"points\": " + std::to_string(currentTotalAmountOfPoints) + "\" }";
+            std::cout << responseJSON << std::endl;
             exitFlag = true;
             break;
         }

@@ -27,7 +27,7 @@ int Fetch::AlphaNumeric(std::string Retailer)
             i += 1;
         }
     }
-    std::cout << "One point for every alphanumeric character in the retailer name: +" << returnResult << std::endl;
+    //std::cout << "One point for every alphanumeric character in the retailer name: +" << returnResult << std::endl;
     return returnResult;
 }
 
@@ -41,14 +41,14 @@ int Fetch::TotalRoundAnd25(std::string Total)
     if (doubleTotal - intTotal == 0)
     {
         returnResult += 50;
-        std::cout << "The total is a round dollar amount with no cents: +50" << std::endl;
+        //std::cout << "The total is a round dollar amount with no cents: +50" << std::endl;
     }
 
     intOperations = ((doubleTotal * 100) / 25);
     if ((intOperations * 25) - (doubleTotal * 100) == 0)
     {
         returnResult += 25;
-        std::cout << "The total is a multiple of 0.25: +25" << std::endl;
+        //std::cout << "The total is a multiple of 0.25: +25" << std::endl;
     }
 
     return returnResult;
@@ -76,7 +76,7 @@ int Fetch::TimePurchase(std::string Time)
             if (min > 0)
             {
                 returnResult = 10;
-                std::cout << "The time of purchase is after 2:00pm and before 4:00pm: +10" << std::endl;
+                //std::cout << "The time of purchase is after 2:00pm and before 4:00pm: +10" << std::endl;
             }
         } 
     }
@@ -109,7 +109,7 @@ int Fetch::OddDay(std::string Date)
             if (dayOperation - day != 0 )
             {
                 returnResult = 6;
-                std::cout << "The day in the purchase date is odd: +6" << std::endl;
+                //std::cout << "The day in the purchase date is odd: +6" << std::endl;
             }
         }
     }
@@ -164,7 +164,7 @@ int Fetch::TrimmedLengthPoints(std::string ItemPrice)
     double price = stod(ItemPrice);
 
     returnResult = ceil(price * 0.2);
-    std::cout << "Item description is a multiple of 3, multiply the price by 0.2 and round up to the nearest integer: +" << returnResult << std::endl;
+    //std::cout << "Item description is a multiple of 3, multiply the price by 0.2 and round up to the nearest integer: +" << returnResult << std::endl;
     return returnResult;
 }
 
@@ -173,6 +173,6 @@ int Fetch::ItemsEven(int CountItems)
     int operationDivision;
     operationDivision = CountItems / 2;
     operationDivision *= 5; 
-    std::cout << "5 points for every two items on the receipt: +" << operationDivision << std::endl;
+    //std::cout << "5 points for every two items on the receipt: +" << operationDivision << std::endl;
 	return operationDivision;
 }
